@@ -110,24 +110,19 @@ rename_dict = {
 }
 wide_df.rename(columns=rename_dict, inplace=True)
 wide_df['District'] = wide_df['District'].str.replace('School District', '', regex=False).str.strip()
+wide_df['District'] = wide_df['District'].str.lower()
 wide_df.to_csv(
     r"C:\Users\nseel\CS\DATA1030\DATA-1030-Final-Project\Cleaned Data\ca_all_years_wide.csv",
     index=False
 )
-print(wide_df.head())
-# Count how many times each district appears
-district_counts = wide_df['District'].value_counts()
+# Write each district to a new line in a text file
+with open('unique_districts.txt', 'w') as f:
+    for district in wide_df['District'].unique():
+        f.write(f"{district}\n")
 
-# Filter districts with fewer than 9 rows
-rare_districts = district_counts[district_counts < 2].index
-
-# Print them
-print("Districts with fewer than 9 rows:")
-count = 0
-for district in rare_districts:
-    print(district)
-    count += 1
-print(count)
-
+dupes = wide_df.groupby(['District', 'Year']).size().reset_index(name='Count')
+duplicates = dupes[dupes['Count'] > 1]
+print(duplicates)
+print(len(duplicates))
 
 
